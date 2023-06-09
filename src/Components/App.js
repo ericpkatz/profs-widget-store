@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import Home from './Home';
 import Login from './Login';
 import Cart from './Cart';
+import Profile from './Profile';
 import { useSelector, useDispatch } from 'react-redux';
 import { removeFromCart, addToCart, loginWithToken, fetchCart, fetchProducts } from '../store';
 import { Link, Routes, Route } from 'react-router-dom';
@@ -17,7 +18,6 @@ const App = ()=> {
   const count = cart.lineItems.reduce((acc, item)=> {
     return acc + item.quantity;
   }, 0);
-  console.log(count);
 
   useEffect(()=> {
     if(auth.id){
@@ -36,9 +36,16 @@ const App = ()=> {
             <nav>
               <Link to='/'>Home</Link>
               <Link to='/cart'>Cart ({  count })</Link>
+              <Link to='/profile'>Profile</Link>
+              {
+                auth.avatar ? (
+                  <img src={ auth.avatar } />
+                ): null
+              }
             </nav>
             <Routes>
               <Route path='/cart' element={ <Cart /> } />
+              <Route path='/profile' element={ <Profile /> } />
             </Routes>
           </div>
         )
