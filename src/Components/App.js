@@ -3,16 +3,21 @@ import Home from './Home';
 import Login from './Login';
 import Cart from './Cart';
 import { useSelector, useDispatch } from 'react-redux';
-import { loginWithToken, fetchCart, fetchProducts } from '../store';
+import { removeFromCart, addToCart, loginWithToken, fetchCart, fetchProducts } from '../store';
 import { Link, Routes, Route } from 'react-router-dom';
 
 const App = ()=> {
-  const { auth, products } = useSelector(state => state);
+  const { auth, products, cart } = useSelector(state => state);
   const dispatch = useDispatch();
   useEffect(()=> {
     dispatch(fetchProducts());
     dispatch(loginWithToken());
   }, []);
+
+  const count = cart.lineItems.reduce((acc, item)=> {
+    return acc + item.quantity;
+  }, 0);
+  console.log(count);
 
   useEffect(()=> {
     if(auth.id){
@@ -30,7 +35,7 @@ const App = ()=> {
           <div>
             <nav>
               <Link to='/'>Home</Link>
-              <Link to='/cart'>Cart</Link>
+              <Link to='/cart'>Cart ({  count })</Link>
             </nav>
             <Routes>
               <Route path='/cart' element={ <Cart /> } />
@@ -46,11 +51,11 @@ const App = ()=> {
                 { product.name }
                 {
                   auth.id ? (
-                    <button>Add to Your Cart</button>
+                    <button onClick={ ()=> dispatch(addToCart({product, quantity: 1}))}>Add to Your Cart</button>
                   ): null
                 }
                 {
-                  !!auth.id && <button>Add to Your Cart</button>
+                  !!auth.id && cart.lineItems.find(lineItem => lineItem.productId === product.id ) && <button onClick={ ()=> dispatch(removeFromCart({ product, quantityToRemove: 1}))}>Remove from Your Cart</button>
                 }
               </li>
             );
