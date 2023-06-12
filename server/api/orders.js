@@ -14,6 +14,16 @@ app.post('/', async(req, res, next)=> {
   }
 });
 
+app.get('/', async(req, res, next)=> {
+  try {
+    const user = await User.findByToken(req.headers.authorization);
+    res.send(await user.getOrders());
+  }
+  catch(ex){
+    next(ex);
+  }
+});
+
 app.get('/cart', async(req, res, next)=> {
   try {
     const user = await User.findByToken(req.headers.authorization);

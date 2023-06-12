@@ -4,11 +4,22 @@ import Login from './Login';
 import Cart from './Cart';
 import Profile from './Profile';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeFromCart, addToCart, loginWithToken, fetchCart, fetchProducts } from '../store';
+import { removeFromCart, addToCart, loginWithToken, fetchCart, fetchProducts, fetchOrders } from '../store';
 import { Link, Routes, Route } from 'react-router-dom';
 
+const Orders = ()=> {
+  const { orders } = useSelector(state => state);
+  return (
+    <pre>
+    {
+      JSON.stringify(orders, null, 2)
+    }
+    </pre>
+  );
+};
+
 const App = ()=> {
-  const { auth, products, cart } = useSelector(state => state);
+  const { auth, products, cart, orders } = useSelector(state => state);
   const dispatch = useDispatch();
   useEffect(()=> {
     dispatch(fetchProducts());
@@ -22,6 +33,7 @@ const App = ()=> {
   useEffect(()=> {
     if(auth.id){
       dispatch(fetchCart());
+      dispatch(fetchOrders());
     }
   }, [auth]);
   return (
@@ -36,6 +48,7 @@ const App = ()=> {
             <nav>
               <Link to='/'>Home</Link>
               <Link to='/cart'>Cart ({  count })</Link>
+              <Link to='/orders'>Orders ({ orders.length })</Link>
               <Link to='/profile'>Profile</Link>
               {
                 auth.avatar ? (
@@ -46,6 +59,7 @@ const App = ()=> {
             <Routes>
               <Route path='/cart' element={ <Cart /> } />
               <Route path='/profile' element={ <Profile /> } />
+              <Route path='/orders' element={ <Orders /> } />
             </Routes>
           </div>
         )

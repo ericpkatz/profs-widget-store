@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../store';
+import { createOrder, fetchCart } from '../store';
 import { Link } from 'react-router-dom';
 
 const Cart = ()=> {
@@ -9,6 +9,14 @@ const Cart = ()=> {
   return (
     <div>
       <h1>Cart</h1>
+      <button 
+        onClick={
+          async()=> {
+            await dispatch(createOrder());
+            await dispatch(fetchCart());
+          }
+        }
+      >Create Order</button>
       <pre>
         {
           JSON.stringify(cart, null, 2)
