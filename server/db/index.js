@@ -3,11 +3,14 @@ const User = require('./User');
 const Product = require('./Product');
 const Order = require('./Order');
 const LineItem  = require('./LineItem');
+const Review = require('./Review'); 
 
 Order.belongsTo(User);
 LineItem.belongsTo(Order);
 Order.hasMany(LineItem);
 LineItem.belongsTo(Product);
+Review.belongsTo(User);
+Review.belongsTo(Product);
 
 const syncAndSeed = async()=> {
   await conn.sync({ force: true });
@@ -28,6 +31,9 @@ const syncAndSeed = async()=> {
   await ethyl.addToCart({ product: foo, quantity: 2});
   await ethyl.addToCart({ product: foo, quantity: 2});
   await ethyl.addToCart({ product: foo, quantity: 2});
+  await Review.create({ userId: moe.id, productId: foo.id, txt: 'I LOVE FOO'}); 
+  await Review.create({ userId: moe.id, productId: bar.id, txt: 'BAR NOT SO GREAT'}); 
+  await Review.create({ userId: lucy.id, productId: bar.id, txt: 'BAR GOOD'}); 
   return {
     users: {
       moe,
@@ -46,5 +52,6 @@ const syncAndSeed = async()=> {
 module.exports = {
   syncAndSeed,
   User,
-  Product
+  Product,
+  Review
 };

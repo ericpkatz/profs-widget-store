@@ -3,8 +3,9 @@ import Home from './Home';
 import Login from './Login';
 import Cart from './Cart';
 import Profile from './Profile';
+import Review from './Review';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeFromCart, addToCart, loginWithToken, fetchCart, fetchProducts, fetchOrders } from '../store';
+import { fetchReviews, removeFromCart, addToCart, loginWithToken, fetchCart, fetchProducts, fetchOrders } from '../store';
 import { Link, Routes, Route } from 'react-router-dom';
 
 const Orders = ()=> {
@@ -19,10 +20,11 @@ const Orders = ()=> {
 };
 
 const App = ()=> {
-  const { auth, products, cart, orders } = useSelector(state => state);
+  const { reviews, auth, products, cart, orders } = useSelector(state => state);
   const dispatch = useDispatch();
   useEffect(()=> {
     dispatch(fetchProducts());
+    dispatch(fetchReviews());
     dispatch(loginWithToken());
   }, []);
 
@@ -60,6 +62,7 @@ const App = ()=> {
               <Route path='/cart' element={ <Cart /> } />
               <Route path='/profile' element={ <Profile /> } />
               <Route path='/orders' element={ <Orders /> } />
+              <Route path='/reviews/:id' element={ <Review /> } />
             </Routes>
           </div>
         )
@@ -67,9 +70,26 @@ const App = ()=> {
       <ul>
         {
           products.map( product => {
+            const productReviews = reviews.filter(review => review.productId === product.id);
             return (
               <li key={ product.id }>
                 { product.name }
+                <ul>
+                  {
+                    productReviews.map( review => {
+                      return (
+                        <li key={ review.id }>
+                          { review.txt } by  
+                          {' ' }
+                          { auth.id === review.userId ? 'YOU' : review.user.username }
+                          { auth.id === review.userId ? (
+                            <Link to={ `/reviews/${review.id }`}>Edit</Link>
+                          ): null } 
+                        </li>
+                      );
+                    })
+                  }
+                </ul>
                 {
                   auth.id ? (
                     <button onClick={ ()=> dispatch(addToCart({product, quantity: 1}))}>Add to Your Cart</button>
