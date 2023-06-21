@@ -8,7 +8,7 @@ const Review = conn.define('review', {
     defaultValue: UUIDV4
   },
   txt: {
-    type: STRING,
+    type: STRING(20),
     allowNull: false,
     validate: {
       notEmpty: true

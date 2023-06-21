@@ -13,4 +13,9 @@ app.use('/api/orders', require('./api/orders'));
 app.use('/api/products', require('./api/products'));
 app.use('/api/reviews', require('./api/reviews'));
 
+app.use((err, req, res, next)=> {
+  console.log(err);
+  res.status(err.status || 500).send({ error: err, message: err.message });
+});
+
 module.exports = app;

@@ -10,7 +10,7 @@ export const fetchReviews = createAsyncThunk("fetchReviews", async()=>{
   }
 })
 
-export const updateReview = createAsyncThunk("updateReview", async(review)=>{
+export const updateReview = createAsyncThunk("updateReview", async(review, { rejectWithValue })=>{
   try{
     const response = await axios.put(`/api/reviews/${review.id}`, review, {
       headers: {
@@ -19,7 +19,7 @@ export const updateReview = createAsyncThunk("updateReview", async(review)=>{
     });
     return response.data;
   }catch(err){
-    console.log(err)
+    return rejectWithValue(err.response.data)
   }
 })
 /*

@@ -9,13 +9,18 @@ const Login = ()=> {
     password: ''
   });
 
+  const [error, setError] = useState('');
+
   const onChange = ev => {
     setCredentials({...credentials, [ ev.target.name ]: ev.target.value });
   };
 
-  const login = (ev)=> {
+  const login = async (ev)=> {
     ev.preventDefault();
-    dispatch(attemptLogin(credentials));
+    const response = await dispatch(attemptLogin(credentials));
+    if(response.error){
+      setError(response.payload.message);
+    }
   };
   return (
     <div>
@@ -33,6 +38,7 @@ const Login = ()=> {
           value={ credentials.password }
           onChange = { onChange }
         />
+        { !!error && <div style={{ color: 'red'}}>{ error}</div> }
         <button>Login</button>
       </form>
     </div>
