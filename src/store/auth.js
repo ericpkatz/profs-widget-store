@@ -16,6 +16,20 @@ export const updateAvatar = createAsyncThunk("updateAvatar", async(payload)=>{
   }
 })
 
+export const updatePlace = createAsyncThunk("updatePlace", async(payload)=>{
+  try{
+    const token = window.localStorage.getItem('token');
+    const response = await axios.put('/api/auth', payload, {
+      headers: {
+        authorization: token
+      }
+    });
+    return response.data;
+  }catch(err){
+    console.log(err)
+  }
+})
+
 export const loginWithToken = createAsyncThunk("loginWithToken", async (_, { rejectWithValue }) => {
   const token = window.localStorage.getItem('token');
   if(token){
@@ -64,6 +78,9 @@ const authSlice = createSlice({
       return action.payload;
     })
     builder.addCase(updateAvatar.fulfilled, (state, action)=>{
+      return action.payload;
+    })
+    builder.addCase(updatePlace.fulfilled, (state, action)=>{
       return action.payload;
     })
   }

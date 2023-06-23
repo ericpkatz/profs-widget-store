@@ -25,7 +25,8 @@ app.get('/', async(req, res, next)=> {
 app.put('/', async(req, res, next)=> {
   try {
     const user = await User.findByToken(req.headers.authorization);
-    await user.update({ avatar: req.body.avatar });
+    //TODO - remove properties user can not update!!
+    await user.update(req.body);
     res.send(user);
   }
   catch(ex){

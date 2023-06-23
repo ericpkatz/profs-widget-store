@@ -1,9 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateAvatar } from '../store';
+import { updateAvatar, updatePlace } from '../store';
 
 const Profile = ()=> {
   const el = useRef();
+  const elPlace = useRef();
+
   const dispatch = useDispatch();
   const { auth } = useSelector(state => state);
   useEffect(()=> {
@@ -19,10 +21,32 @@ const Profile = ()=> {
       });
     }
   }, [el]);
+
+  useEffect(()=> {
+    if(elPlace.current){
+      console.log('set up autocomplete');
+      const options = {
+        fields: ['address_components', 'formatted_address', 'geometry']
+      };
+      const autocomplete = new google.maps.places.Autocomplete(elPlace.current, options);
+      autocomplete.addListener('place_changed', ()=> {
+        const place = autocomplete.getPlace();
+        dispatch(updatePlace({ place }));
+
+      });      
+    }
+  }, [elPlace]);
   
   return (
     <div>
       <h2>Profile</h2>
+      <input ref={ elPlace } style={{ height: '2rem', width: 'calc(100% - 2rem)', margin: '1rem'}}/>
+      <br />
+        <pre>
+         {
+            JSON.stringify(auth.place, null, 2)
+         }
+        </pre>
       <input type='file' ref={ el } />
       {
         auth.avatar ? (

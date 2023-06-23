@@ -1,2 +1,4 @@
 node_modules
 dist
+secrets.js
+package-lock.json
