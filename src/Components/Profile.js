@@ -1,13 +1,32 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateAvatar, updatePlace } from '../store';
 
 const Profile = ()=> {
   const el = useRef();
   const elPlace = useRef();
+  const elMap = useRef();
 
   const dispatch = useDispatch();
   const { auth } = useSelector(state => state);
+  const [map, setMap] = useState(null);
+
+  useEffect(()=> {
+    if(auth.place.geometry && map){
+      map.setCenter(auth.place.geometry.location);
+    }
+  }, [auth.place, map]);
+
+  useEffect(()=> {
+    if(elMap.current){
+      const _map = new google.maps.Map(elMap.current, {
+        center: { lat: -34.397, lng: 150.644 },
+        zoom: 15,
+      });
+      setMap(_map);
+    }
+  }, [elMap]);
+
   useEffect(()=> {
     if(el.current){
       el.current.addEventListener('change', (ev)=> {
@@ -41,6 +60,7 @@ const Profile = ()=> {
     <div>
       <h2>Profile</h2>
       <input ref={ elPlace } style={{ height: '2rem', width: 'calc(100% - 2rem)', margin: '1rem'}}/>
+      <div ref={ elMap } style={{ height: '300px'}}></div>
       <br />
         <pre>
          {

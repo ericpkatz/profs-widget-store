@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Home from './Home';
 import Login from './Login';
 import Cart from './Cart';
@@ -21,6 +21,9 @@ const Orders = ()=> {
 
 const App = ()=> {
   const { reviews, auth, products, cart, orders } = useSelector(state => state);
+
+  const prevAuth = useRef(auth);
+
   const dispatch = useDispatch();
   useEffect(()=> {
     dispatch(fetchProducts());
@@ -33,11 +36,30 @@ const App = ()=> {
   }, 0);
 
   useEffect(()=> {
+    if(!prevAuth.current.id && auth.id){
+      console.log('you just logged in');
+      dispatch(fetchCart());
+      dispatch(fetchOrders());
+    }
+
+    if(prevAuth.current.id && !auth.id){
+      console.log('you just logged out');
+    }
+  }, [auth, prevAuth]);
+
+  /*
+  useEffect(()=> {
     if(auth.id){
       dispatch(fetchCart());
       dispatch(fetchOrders());
     }
   }, [auth]);
+  */
+
+  useEffect(()=> {
+    prevAuth.current = auth;
+  });
+
   return (
     <div>
       <h1>Acme Shopping</h1>
