@@ -3,6 +3,7 @@ const { JSON, TEXT, STRING, UUID, UUIDV4 } = conn.Sequelize;
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const JWT = process.env.JWT;
+const axios = require('axios');
 
 
 const User = conn.define('user', {
@@ -10,6 +11,10 @@ const User = conn.define('user', {
     type: UUID,
     primaryKey: true,
     defaultValue: UUIDV4
+  },
+  login: {
+    type: STRING,
+    unique: true
   },
   username: {
     type: STRING,
@@ -159,6 +164,53 @@ User.authenticate = async function({ username, password }){
   const error = new Error('bad credentials');
   error.status = 401;
   throw error;
+}
+
+User.authenticateGithub = async function(code){
+  let response = await axios.post(
+    'https://github.com/login/oauth/access_token', {
+      code,
+      client_secret: process.env.CLIENT_SECRET,
+      client_id: process.env.CLIENT_ID
+    }, {
+      headers: {
+        accept: 'application/json'
+      }
+    }
+  );
+  const { access_token, error } = response.data;
+  if(error){
+    const _error = Error(error);
+    _error.status = 401;
+    throw _error;
+  }
+
+  response = await axios.get('https://api.github.com/user', {
+    headers: {
+      authorization: `Bearer ${ access_token }`
+    }
+  });
+
+  const { login } = response.data;
+
+  let user = await User.findOne({
+    where: { login }
+  });
+
+  if(!user){
+    user = await User.create({
+      login,
+      username: `Github-${ login }`,
+      password: `random-${ Math.random() }`
+    });
+  }
+
+  await user.update({
+      username: `Github-${ login }`
+  });
+
+
+  return user.generateToken();
 }
 
 module.exports = User;

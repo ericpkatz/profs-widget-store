@@ -8,7 +8,8 @@ app.use('/dist', express.static(path.join(__dirname, '../dist')));
 app.use('/static', express.static(path.join(__dirname, '../static')));
 
 app.get('/', (req, res)=> res.render(path.join(__dirname, '../static/index.html'), {
-  API_KEY: process.env.API_KEY
+  API_KEY: process.env.API_KEY,
+  CLIENT_ID: process.env.CLIENT_ID
 }));
 
 app.use('/api/auth', require('./api/auth'));

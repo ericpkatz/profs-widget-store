@@ -41,6 +41,7 @@ const Login = ()=> {
         { !!error && <div style={{ color: 'red'}}>{ error}</div> }
         <button>Login</button>
       </form>
+      <a href={`https://github.com/login/oauth/authorize?client_id=${window.CLIENT_ID}`}>Login Via Github</a>
     </div>
   );
 };
