@@ -15,13 +15,29 @@ if(!process.env.API_KEY){
   throw 'NO API KEY';
 }
 const app = require('./app');
-const { syncAndSeed } = require('./db');
+const { syncAndSeed, User } = require('./db');
+const { Server } = require("socket.io");
+const { socketMap } = require('./io');
 
 const init = async()=> {
   try {
     await syncAndSeed();
     const port = process.env.PORT || 3000;
-    app.listen(port, ()=> console.log(`listening on port ${port}`));
+    const server = app.listen(port, ()=> console.log(`listening on port ${port}`));
+    const socketServer = new Server(server);
+    socketServer.on('connection', (socket) => {
+      let user;
+      socket.on('token', async(token) => {
+        user = await User.findByToken(token);
+        socketMap[user.id] = socket;
+      });
+      socket.on('disconnect', ()=> {
+        if(user){
+          console.log(`${user.username} disconnected.`);
+          delete socketMap[user.id];
+        }
+      });
+    });
   }
   catch(ex){
     console.log(ex);

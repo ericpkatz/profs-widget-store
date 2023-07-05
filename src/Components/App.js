@@ -5,7 +5,7 @@ import Cart from './Cart';
 import Profile from './Profile';
 import Review from './Review';
 import { useSelector, useDispatch } from 'react-redux';
-import { createReview, deleteReview, fetchReviews, removeFromCart, addToCart, loginWithToken, fetchCart, fetchProducts, fetchOrders } from '../store';
+import { reviewsSliceActions, createReview, deleteReview, fetchReviews, removeFromCart, addToCart, loginWithToken, fetchCart, fetchProducts, fetchOrders } from '../store';
 import { Link, Routes, Route } from 'react-router-dom';
 import { faker } from '@faker-js/faker';
 
@@ -41,10 +41,19 @@ const App = ()=> {
       console.log('you just logged in');
       dispatch(fetchCart());
       dispatch(fetchOrders());
+      window.socket = io();
+      socket.emit('token', window.localStorage.getItem('token'));
+      window.socket.on('reviewCreated', review => {
+        dispatch(reviewsSliceActions.reviewCreated(review));
+      });
+      window.socket.on('reviewDestroyed', review => {
+        dispatch(reviewsSliceActions.reviewDestroyed(review));
+      });
     }
 
     if(prevAuth.current.id && !auth.id){
       console.log('you just logged out');
+      window.socket.close();
     }
   }, [auth, prevAuth]);
 

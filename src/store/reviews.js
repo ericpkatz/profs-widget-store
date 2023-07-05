@@ -82,7 +82,14 @@ export const removeFromCart = createAsyncThunk("removeFromCart", async(payload)=
 const reviewsSlice = createSlice({
   name:"reviews",
   initialState: [],
-  reducers: {},
+  reducers: {
+    reviewCreated: (state, action) => {
+      return [...state, action.payload];
+    },
+    reviewDestroyed: (state, action) => {
+      return state.filter(review => review.id !== action.payload.id); 
+    }
+  },
   extraReducers: (builder)=>{
     builder.addCase(fetchReviews.fulfilled, (state, action)=>{
       return action.payload;
@@ -104,5 +111,8 @@ const reviewsSlice = createSlice({
     */
   }
 })
+const reviewsSliceActions = reviewsSlice.actions;
+
+export { reviewsSliceActions };
 
 export default reviewsSlice.reducer;
