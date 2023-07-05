@@ -22,6 +22,32 @@ export const updateReview = createAsyncThunk("updateReview", async(review, { rej
     return rejectWithValue(err.response.data)
   }
 })
+
+export const createReview = createAsyncThunk("createReview", async(review, { rejectWithValue })=>{
+  try{
+    const response = await axios.post('/api/reviews/', review, {
+      headers: {
+        authorization: window.localStorage.getItem('token')
+      }
+    });
+    return response.data;
+  }catch(err){
+    return rejectWithValue(err.response.data)
+  }
+})
+
+export const deleteReview = createAsyncThunk("deleteReview", async(review, { rejectWithValue })=>{
+  try{
+    const response = await axios.delete(`/api/reviews/${review.id}`, {
+      headers: {
+        authorization: window.localStorage.getItem('token')
+      }
+    });
+    return review;
+  }catch(err){
+    return rejectWithValue(err.response.data)
+  }
+})
 /*
 
 export const addToCart = createAsyncThunk("addToCart", async(payload)=>{
@@ -60,6 +86,12 @@ const reviewsSlice = createSlice({
   extraReducers: (builder)=>{
     builder.addCase(fetchReviews.fulfilled, (state, action)=>{
       return action.payload;
+    })
+    builder.addCase(deleteReview.fulfilled, (state, action)=>{
+      return state.filter(review => review.id !== action.payload.id);
+    })
+    builder.addCase(createReview.fulfilled, (state, action)=>{
+      return [...state, action.payload];
     })
     builder.addCase(updateReview.fulfilled, (state, action)=>{
       return state.map(review => review.id === action.payload.id ? action.payload : review);

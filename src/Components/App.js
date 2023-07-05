@@ -5,8 +5,9 @@ import Cart from './Cart';
 import Profile from './Profile';
 import Review from './Review';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchReviews, removeFromCart, addToCart, loginWithToken, fetchCart, fetchProducts, fetchOrders } from '../store';
+import { createReview, deleteReview, fetchReviews, removeFromCart, addToCart, loginWithToken, fetchCart, fetchProducts, fetchOrders } from '../store';
 import { Link, Routes, Route } from 'react-router-dom';
+import { faker } from '@faker-js/faker';
 
 const Orders = ()=> {
   const { orders } = useSelector(state => state);
@@ -96,6 +97,9 @@ const App = ()=> {
             return (
               <li key={ product.id }>
                 { product.name }
+                {
+                  !!auth.id && <button onClick={ ()=> dispatch(createReview({ productId: product.id, txt: faker.company.buzzPhrase().substring(0, 20)}))}>Create A Random Review</button>
+                }
                 <ul>
                   {
                     productReviews.map( review => {
@@ -106,6 +110,9 @@ const App = ()=> {
                           { auth.id === review.userId ? 'YOU' : review.user.username }
                           { auth.id === review.userId ? (
                             <Link to={ `/reviews/${review.id }`}>Edit</Link>
+                          ): null } 
+                          { auth.id === review.userId ? (
+                            <button onClick={()=> dispatch(deleteReview(review))}>x</button>
                           ): null } 
                         </li>
                       );
